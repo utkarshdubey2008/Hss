@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Browser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #browser {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+        }
+        .ads {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Web Browser</h1>
+
+    <!-- Search bar to enter a URL or search query -->
+    <input type="text" id="urlInput" placeholder="Enter URL or search query" style="width: 80%;">
+    <button onclick="loadPage()">Go</button>
+
+    <!-- Browser window (iframe) -->
+    <iframe id="browser" src="https://www.example.com"></iframe>
+
+    <!-- Ad space -->
+    <div class="ads">
+        <h3>Your Ads</h3>
+        <a href="https://envs.sh/AD2.jpg"><img src="ad-image.jpg" alt="Ad"></a>
+    </div>
+
+    <script>
+        function loadPage() {
+            let input = document.getElementById("urlInput").value;
+            let iframe = document.getElementById("browser");
+            let url;
+
+            // Check if input is a valid URL or search query
+            if (input.startsWith('http://') || input.startsWith('https://')) {
+                url = input;
+            } else {
+                // Use Google search as default for queries
+                url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+            }
+
+            // Load the URL in the iframe
+            iframe.src = url;
+        }
+    </script>
+</body>
+</html>
