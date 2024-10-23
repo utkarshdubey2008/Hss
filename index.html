@@ -182,20 +182,10 @@
             } else {
                 // Redirect to Google search for queries
                 url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
-                window.open(url, '_blank'); // Open Google search in a new tab
-                return;
             }
 
-            // Check for cross-origin restriction
-            const allowedDomains = ['yourdomain.com']; // Replace with domains you allow in iframe
-            const domain = (new URL(url)).hostname;
-
-            if (!allowedDomains.includes(domain)) {
-                window.open(url, '_blank'); // Open disallowed domains in new tab
-            } else {
-                tabs[currentTabIndex].url = url;
-                document.getElementById("browser").src = url;
-            }
+            tabs[currentTabIndex].url = url;
+            document.getElementById("browser").src = url;
         }
 
         // Switch between tabs
