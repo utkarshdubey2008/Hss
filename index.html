@@ -3,54 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Browser</title>
+    <title>Simple Web Browser</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
-        #browser {
+
+        /* Search Bar Styling */
+        #search-bar {
             width: 100%;
-            height: 600px;
-            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #2d2d2d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
+        #urlInput {
+            width: 60%;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            outline: none;
+            margin-right: 10px;
+        }
+
+        #urlInput:focus {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Browser Window Styling */
+        iframe {
+            width: 100%;
+            height: 85vh;
+            border: none;
+            display: block;
+        }
+
+        /* Ads Section */
         .ads {
-            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .ads img {
+            max-width: 200px;
+            margin: 0 10px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .ads img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #urlInput {
+                width: 75%;
+                margin-right: 5px;
+            }
+            button {
+                padding: 8px 15px;
+            }
+            iframe {
+                height: 75vh;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #urlInput {
+                width: 70%;
+                font-size: 14px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+            iframe {
+                height: 70vh;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Simple Web Browser</h1>
 
-    <!-- Search bar to enter a URL or search query -->
-    <input type="text" id="urlInput" placeholder="Enter URL or search query" style="width: 80%;">
-    <button onclick="loadPage()">Go</button>
+    <!-- Search Bar -->
+    <div id="search-bar">
+        <input type="text" id="urlInput" placeholder="Enter URL or search query..." autocomplete="off">
+        <button onclick="loadPage()">Go</button>
+    </div>
 
-    <!-- Browser window (iframe) -->
+    <!-- Browser Window -->
     <iframe id="browser" src="https://www.example.com"></iframe>
 
-    <!-- Ad space -->
+    <!-- Ads Section -->
     <div class="ads">
-        <h3>Your Ads</h3>
-        <a href="https://envs.sh/AD2.jpg"><img src="ad-image.jpg" alt="Ad"></a>
+        <a href="https://envs.sh/AD2.jpg" target="_blank">
+            <img src="https://envs.sh/AD2.jpg" alt="Ad">
+        </a>
     </div>
 
     <script>
         function loadPage() {
-            let input = document.getElementById("urlInput").value;
-            let iframe = document.getElementById("browser");
+            const input = document.getElementById("urlInput").value;
+            const iframe = document.getElementById("browser");
             let url;
 
-            // Check if input is a valid URL or search query
+            // If the input is a URL, load it, otherwise perform a Google search
             if (input.startsWith('http://') || input.startsWith('https://')) {
-                url = input;
+                url = input;  // Load the URL directly if it's valid
             } else {
-                // Use Google search as default for queries
-                url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+                url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;  // Google search for queries
             }
 
-            // Load the URL in the iframe
+            // Load the input URL or search query in the iframe
             iframe.src = url;
         }
     </script>
+
 </body>
 </html>
