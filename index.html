@@ -4,141 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional Web Browser</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-
-        /* Navbar (fixed at top) */
-        #navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #2c3e50;
-            color: white;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Tab styles */
-        .tab-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tab {
-            padding: 8px 12px;
-            background-color: #3498db;
-            border-radius: 20px;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .tab:hover {
-            background-color: #2980b9;
-        }
-
-        .tab.active {
-            background-color: #1abc9c;
-        }
-
-        #urlInput {
-            width: 40%;
-            padding: 10px 15px;
-            font-size: 16px;
-            border: none;
-            border-radius: 30px;
-            margin-right: 10px;
-            outline: none;
-        }
-
-        #urlInput:focus {
-            box-shadow: 0 0 5px #1abc9c;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 20px;
-            background-color: #1abc9c;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #16a085;
-        }
-
-        /* Browser window (positioned below navbar) */
-        #browser-container {
-            padding-top: 70px; /* To ensure content doesn't overlap with navbar */
-        }
-
-        #browser {
-            width: 100%;
-            height: calc(100vh - 120px); /* Ensures full height but adjusts for navbar height */
-            border: none;
-            display: block;
-        }
-
-        /* Ads Section */
-        .ads {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .ads img {
-            max-width: 200px;
-            margin: 0 10px;
-            border-radius: 10px;
-            transition: transform 0.3s ease;
-        }
-
-        .ads img:hover {
-            transform: scale(1.05);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            #urlInput {
-                width: 60%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #urlInput {
-                width: 70%;
-                font-size: 14px;
-            }
-
-            button {
-                font-size: 14px;
-                padding: 8px 15px;
-            }
-
-            .tab {
-                font-size: 12px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS -->
 </head>
 <body>
 
@@ -148,8 +14,15 @@
             <div class="tab active" onclick="switchTab(0)">Tab 1</div>
             <div class="tab" onclick="addTab()">+ New Tab</div>
         </div>
-        <input type="text" id="urlInput" placeholder="Enter URL or search..." autocomplete="off">
-        <button onclick="loadPage()">Go</button>
+        <div class="search-container">
+            <input type="text" id="urlInput" placeholder="Enter URL or search..." autocomplete="off">
+            <button onclick="loadPage()">Go</button>
+        </div>
+        <div class="menu-dots" onclick="openMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </div>
 
     <!-- Browser Container -->
@@ -164,81 +37,7 @@
         </a>
     </div>
 
-    <script>
-        // Store for tab URLs
-        let tabs = [{ url: '' }];
-        let currentTabIndex = 0;
-
-        // Load the page or search based on input
-        function loadPage() {
-            const input = document.getElementById("urlInput").value.trim();
-            let url;
-
-            // Check if input is a valid URL
-            if (input.startsWith('http://') || input.startsWith('https://')) {
-                url = input;
-            } else if (input.includes('.')) {
-                url = `https://${input}`;
-            } else {
-                // Redirect to Google search for queries
-                url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
-            }
-
-            tabs[currentTabIndex].url = url;
-            document.getElementById("browser").src = url;
-        }
-
-        // Switch between tabs
-        function switchTab(index) {
-            currentTabIndex = index;
-            const iframe = document.getElementById("browser");
-            iframe.src = tabs[index].url;
-            updateActiveTab();
-        }
-
-        // Add a new tab
-        function addTab() {
-            tabs.push({ url: '' });
-            currentTabIndex = tabs.length - 1;
-            updateTabs();
-            loadPage(); // Load empty tab
-        }
-
-        // Update the tab buttons dynamically
-        function updateTabs() {
-            const tabContainer = document.getElementById('tabs');
-            tabContainer.innerHTML = '';
-
-            // Create tab buttons
-            tabs.forEach((tab, index) => {
-                const tabButton = document.createElement('div');
-                tabButton.className = 'tab';
-                tabButton.textContent = `Tab ${index + 1}`;
-                tabButton.onclick = () => switchTab(index);
-                tabContainer.appendChild(tabButton);
-            });
-
-            // Add "New Tab" button
-            const newTabButton = document.createElement('div');
-            newTabButton.className = 'tab';
-            newTabButton.textContent = '+ New Tab';
-            newTabButton.onclick = addTab;
-            tabContainer.appendChild(newTabButton);
-
-            updateActiveTab();
-        }
-
-        // Highlight the active tab
-        function updateActiveTab() {
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach((tab, index) => {
-                tab.classList.toggle('active', index === currentTabIndex);
-            });
-        }
-
-        // Initial update for tabs
-        updateTabs();
-    </script>
-
+    <!-- Include your script file -->
+    <script src="script.js"></script>
 </body>
 </html>
