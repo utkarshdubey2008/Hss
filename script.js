@@ -1,97 +1,59 @@
-<script>
-    // Store for tab URLs
-    let tabs = [{ url: '' }];
-    let currentTabIndex = 0;
+// Select elements
+const chatBox = document.getElementById("chat-box");
+const userInput = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
 
-    // Load the page or search based on input
-    function loadPage() {
-        const input = document.getElementById("urlInput").value.trim();
-        let url;
+// API Key and endpoint setup
+const API_KEY = "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";
+const API_URL = "https://api.groq.com/v1/chat/completions";
 
-        // Check if input is a valid URL
-        if (input.startsWith('http://') || input.startsWith('https://')) {
-            url = input;
-        } else if (input.includes('.')) {
-            url = `https://${input}`;
-        } else {
-            // Redirect to Google search for queries
-            url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
-        }
+// Function to append messages to chat
+function addMessage(content, isUser = false) {
+    const message = document.createElement("div");
+    message.classList.add("message", isUser ? "user" : "bot");
+    message.innerText = content;
+    chatBox.appendChild(message);
+    chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll
+}
 
-        tabs[currentTabIndex].url = url;
-        document.getElementById("browser").src = url;
+// Function to send user message to Groq API
+async function sendMessage() {
+    const message = userInput.value;
+    if (!message) return;
 
-        // Error handling for refused connections (site blocking iframe)
-        document.getElementById("browser").onload = function() {
-            checkIframeLoaded();
-        };
+    // Display user message
+    addMessage(message, true);
+    userInput.value = "";
+
+    // Request data
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+            model: "llama3-8b-8192",
+            messages: [{ role: "user", content: message }],
+            temperature: 1,
+            max_tokens: 1024,
+            top_p: 1,
+            stream: false  // Streaming not supported in frontend fetch API
+        })
+    });
+
+    // Check for a valid response
+    if (response.ok) {
+        const data = await response.json();
+        const botMessage = data.choices[0].message.content;
+        addMessage(botMessage, false);
+    } else {
+        addMessage("Error: Unable to retrieve response from AI.", false);
     }
+}
 
-    // Check if the iframe content is blocked
-    function checkIframeLoaded() {
-        const iframe = document.getElementById("browser");
-        try {
-            const iframeContent = iframe.contentWindow || iframe.contentDocument;
-            if (iframeContent.document) {
-                // If we can access the content, everything is fine
-                console.log("Iframe loaded successfully");
-            }
-        } catch (error) {
-            // If an error occurs, the site is likely blocking the iframe
-            console.error("Site refused to connect in iframe", error);
-            alert("This site does not allow embedding. Opening in a new tab.");
-            window.open(tabs[currentTabIndex].url, '_blank');
-        }
-    }
-
-    // Switch between tabs
-    function switchTab(index) {
-        currentTabIndex = index;
-        const iframe = document.getElementById("browser");
-        iframe.src = tabs[index].url;
-        updateActiveTab();
-    }
-
-    // Add a new tab
-    function addTab() {
-        tabs.push({ url: '' });
-        currentTabIndex = tabs.length - 1;
-        updateTabs();
-        loadPage(); // Load empty tab
-    }
-
-    // Update the tab buttons dynamically
-    function updateTabs() {
-        const tabContainer = document.getElementById('tabs');
-        tabContainer.innerHTML = '';
-
-        // Create tab buttons
-        tabs.forEach((tab, index) => {
-            const tabButton = document.createElement('div');
-            tabButton.className = 'tab';
-            tabButton.textContent = `Tab ${index + 1}`;
-            tabButton.onclick = () => switchTab(index);
-            tabContainer.appendChild(tabButton);
-        });
-
-        // Add "New Tab" button
-        const newTabButton = document.createElement('div');
-        newTabButton.className = 'tab';
-        newTabButton.textContent = '+ New Tab';
-        newTabButton.onclick = addTab;
-        tabContainer.appendChild(newTabButton);
-
-        updateActiveTab();
-    }
-
-    // Highlight the active tab
-    function updateActiveTab() {
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach((tab, index) => {
-            tab.classList.toggle('active', index === currentTabIndex);
-        });
-    }
-
-    // Initial update for tabs
-    updateTabs();
-</script>
+// Event listener for button click and 'Enter' key
+sendBtn.addEventListener("click", sendMessage);
+userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
