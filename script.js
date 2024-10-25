@@ -1,26 +1,8 @@
-// Select elements
-const chatBox = document.getElementById("chat-box");
-const userInput = document.getElementById("user-input");
-const sendBtn = document.getElementById("send-btn");
-
-// API Key and endpoint setup
-const API_KEY = "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";
-const API_URL = "https://api.groq.com/v1/chat/completions";
-
-// Function to append messages to chat
-function addMessage(content, isUser = false) {
-    const message = document.createElement("div");
-    message.classList.add("message", isUser ? "user" : "bot");
-    message.innerText = content;
-    chatBox.appendChild(message);
-    chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll
-}
-
 // Function to send user message to Groq API
 async function sendMessage() {
     const message = userInput.value;
     if (!message) {
-        console.log("No message entered."); // Log if input is empty
+        console.log("No message entered.");
         return;
     }
 
@@ -28,7 +10,11 @@ async function sendMessage() {
     addMessage(message, true);
     userInput.value = "";
 
-    console.log("Sending message to Groq API:", message); // Log the message
+    // Add loading indicator
+    const loadingMessage = "Loading...";
+    addMessage(loadingMessage, false);
+
+    console.log("Sending message to Groq API:", message);
 
     try {
         const response = await fetch(API_URL, {
@@ -47,6 +33,13 @@ async function sendMessage() {
             })
         });
 
+        // Remove loading indicator
+        const messages = document.querySelectorAll(".message");
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage.innerText === loadingMessage) {
+            lastMessage.remove();
+        }
+
         // Check for valid response
         if (response.ok) {
             const data = await response.json();
@@ -61,9 +54,3 @@ async function sendMessage() {
         addMessage("Error: Could not connect to API.", false);
     }
 }
-
-// Event listener for button click and 'Enter' key
-sendBtn.addEventListener("click", sendMessage);
-userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage();
-});
